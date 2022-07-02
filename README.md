@@ -1,2 +1,2 @@
-# European-Options-Pricing-
-Implementation of fundamental pricing models for European options
+# European-Options-Pricing
+In this repository you can find a documentation and some python code. This is my first attempt of implementing different fundamental pricing models for European options. The implementation consists of the Black-Scholes model, a stochastic volatility model and a special case of a jump-diffusion model, namely, the Merton model. In the documentation you can find some very brief theoretical introduction into each model and the approach that is used in the implementation to calculate the actual prices (mostly Monte-Carlo simulations). Note that the documentation is by no means complete and is more to understand as an attempt of me writing down my thoughts while coding.
