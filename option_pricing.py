@@ -3,14 +3,35 @@ import pandas as pd
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 import seaborn as sns
+#!pip install backtesting
 
+class Brownian_Motion:
+  def __init__(self, stepsize):
+    self.stepsize = stepsize
+    self.current_value = 0
+    self.path = [0]
+
+  def step(self):
+    self.s = np.random.normal(0, self.stepsize)
+    self.current_value += self.s
+    self.path.append(self.current_value)
+
+  def get_step(self):
+    return self.s
+
+  def get_current_value(self):
+    return self.current_value
+
+  def get_path(self):
+    return self.path
 
 class European_Option:
-###############################################################################################
-# The object European_Option can be initialized with all relevant information about the option. 
-# Currently, there are two pricing functions implemented, namely the Black-Scholes model and a 
-# stochastic volatility model, which uses Monte-Carlo simulation to calculate the price.
-###############################################################################################
+    
+  ###############################################################################################
+  # The object European_Option can be initialized with all relevant information about the option. 
+  # Currently, there are two pricing functions implemented, namely the Black-Scholes model and a 
+  # stochastic volatility model, which uses Monte-Carlo simulation to calculate the price.
+  ###############################################################################################
 
   def __init__(self, Option_type, stock_price, strike, vol, time_to_maturity, interest_rate):
     # Option_type can either be "Call" or "Put"
@@ -67,7 +88,12 @@ class European_Option:
     payoffs = []
     final_prices = []
     returns = []
+    # initialize brownian motions
+    BM_1 = Brownian_Motion(1)
+    BM_2 = Brownian_Motion(1)
     for i in range(0,n):
+      BM_1.step()
+      BM_2.step()
       S_t = self.stock_price
       current_variance = vega
       previous_variance = current_variance
@@ -77,8 +103,10 @@ class European_Option:
         # Stochastic Volatility
         if Stochastic_Vol: 
           # Calculate increments of two correlated brownian motions (See Documentation)
-          W1 = np.random.randn()
-          W2 = W1 * rho + np.sqrt(1-(rho**2)) * np.random.randn()
+          # W1 = np.random.randn()
+          W1 = BM_1.get_step()
+          # W2 = W1 * rho + np.sqrt(1-(rho**2)) * np.random.randn()
+          W2 = W1 * rho + np.sqrt(1-(rho**2)) * BM_2.get_step()
           # Calculate stock price at new time point (See Documentation) 
           S_t_old = S_t
           S_t = S_t + self.interest_rate * S_t * dt + S_t * np.sqrt(current_variance * dt) * W1
@@ -97,7 +125,6 @@ class European_Option:
         # Merton Model TODO
         elif Jumps:
           pass
-
 
         step += dt
       
